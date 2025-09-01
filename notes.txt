@@ -1,0 +1,12 @@
+create model with migration
+    php artisan make:model LoginOnDevice -m
+
+create a model, controller, and migration all at once using a single Artisan command.
+    php artisan make:model ModelName -mc
+
+rollback last migration : 
+    php artisan migrate:rollback --step=1
+
+rerun migration 
+    php artisan migrate:refresh
+
