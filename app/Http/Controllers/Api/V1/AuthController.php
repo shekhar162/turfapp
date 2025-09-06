@@ -150,7 +150,7 @@ class AuthController extends Controller
         if($deleted){
            return $this->responseWithData(
                 [
-                    'user' => $request->user()
+                    $request->user()
                 ],
                 'You logged out successfully.'
             ); 
