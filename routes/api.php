@@ -19,9 +19,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/v1/admin/profile', [AdminProfileController::class, 'profile']);
 
-    Route::get('/v1/admin/turf/list', [ProductController::class, 'index']);
-    Route::post('/v1/admin/turf/create', [ProductController::class, 'create']);
-    Route::post('/v1/admin/turf/update', [ProductController::class, 'update']);
-    Route::post('/v1/admin/turf/details', [ProductController::class, 'show']);
-    Route::post('/v1/admin/turf/delete', [ProductController::class, 'delete']);
+    Route::get('/v1/admin/product/list', [ProductController::class, 'index']);
+    Route::post('/v1/admin/product/create', [ProductController::class, 'create']);
+    Route::post('/v1/admin/product/update', [ProductController::class, 'update']);
+    Route::post('/v1/admin/product/details', [ProductController::class, 'show']);
+    Route::post('/v1/admin/product/delete', [ProductController::class, 'delete']);
 });

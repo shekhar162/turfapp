@@ -16,7 +16,7 @@ class ProductController extends Controller
     public function index(Request $request){
         $user = $request->user();
         return $this->responseWithData(
-            $user->products()->with('price')->get()
+            ["products" => $user->products()->with('price')->get()]
         );
     }
 
