@@ -17,7 +17,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // These routes will require Sanctum authentication
     Route::post('/v1/admin/logout', [AuthController::class, 'logout']);
 
-    Route::post('/v1/admin/profile', [AdminProfileController::class, 'profile']);
+    Route::get('/v1/admin/profile', [AdminProfileController::class, 'profile']);
 
     Route::get('/v1/admin/product/list', [ProductController::class, 'index']);
     Route::post('/v1/admin/product/create', [ProductController::class, 'create']);
