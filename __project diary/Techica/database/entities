@@ -1,0 +1,27 @@
+Entity
+    user
+        super admin
+            Accounts
+            policy
+
+        admin
+            login devices
+            profile
+            product
+            Orders
+            promotions
+            expenses
+            
+        booker
+            profie
+            bookings
+            friends
+        
+        Common
+            payments
+            invoices
+
+
+
+    
+

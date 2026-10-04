@@ -22,7 +22,7 @@ class AuthController extends Controller
     public function getOtp(Request $request){
         $validator = Validator::make($request->all(), [
             'mobileNumber' => 'required|min:10|max:10',
-            'requestingFor'=>'required',
+            'requestedFor'=>'required',
             'deviceId'=> 'required|min:10|max:255'
         ]);
 
@@ -37,7 +37,7 @@ class AuthController extends Controller
         // save into otps model
         $otp = new Otp;
         $otp->mobileNumber = $request->mobileNumber;
-        $otp->requestingFor = $request->requestingFor;
+        $otp->requestedFor = $request->requestedFor;
         $otp->deviceId = $request->deviceId;
         $otp->otp = $random;
         $otp->expires_at = Carbon::now()->addMinutes(60);
@@ -46,7 +46,7 @@ class AuthController extends Controller
         return $this->responseWithData(
             [
                 'mobileNumber'=>$request->mobileNumber,
-                'requestingFor'=> $request->requestingFor,
+                'requestedFor'=> $request->requestedFor,
                 'deviceId' => $request->deviceId,
                 'otp'=>$random,
                 'id'=>$otp->id
@@ -59,7 +59,7 @@ class AuthController extends Controller
         // validate data
         $validator = Validator::make($request->all(), [
             'mobileNumber' => 'required|min:10|max:10',
-            'requestingFor'=>'required',
+            'requestedFor'=>'required',
             'deviceId'=> 'required|min:10|max:255',
             'otp' => 'required|min:6|max:6',
         ]);
@@ -71,8 +71,11 @@ class AuthController extends Controller
 
         // get otps shared on requested number
         $otpRecord = null;
-        $otpRecord = Otp::where('mobileNumber', $request->mobileNumber)
-        ->where('otp', $request->otp)
+        $otpRecord = Otp::where(
+            [
+                'mobileNumber' => $request->mobileNumber, 
+                'otp' => $request->otp
+            ])
         ->latest()
         ->first();
 
@@ -90,17 +93,28 @@ class AuthController extends Controller
         // so basically a profile uniqueness defined by 
         // combinationa of mobile number and device id
         // the combination of this both data stored in email id
-        $user = User::where('mobileNumber', $request->mobileNumber)->where('deviceId', $request->deviceId)->first();
+        $isBoxAdmin = false;
+        if(!User::where(['mobileNumber' => $request->mobileNumber])->first()){
+            $isBoxAdmin = true;
+        }
+        $user = null;
+        $user = User::where(['mobileNumber' => $request->mobileNumber, 'deviceId' => $request->deviceId])->first();
         $token = null;
 
         if (!$user) {
             // Create user if not exists
-            $user = User::create([
+            $userData = [];
+            $userData = [
                 'mobileNumber' => $request->mobileNumber,
                 'deviceId'=>$request->deviceId,
-                'email' => trim($request->mobileNumber.'-'.$request->deviceId),
-                'password' => Hash::make($request->mobileNumber), // Random password
-            ]);
+                'email' => trim($request->email) ? trim($request->email) : null,
+                'password' => Hash::make($request->mobileNumber), // Random password,
+                'boxAdmin' => ($isBoxAdmin === true) ? 'Y' : 'N',
+                'role' => ($request->role) ? $request->role : 2,
+            ];
+
+            $user = User::create($userData);
+            
 
             // Create new token
             $token = $user->createToken('auth_token')->plainTextToken;
@@ -127,7 +141,7 @@ class AuthController extends Controller
         }
 
         // find total loggedin device
-        $totalLoggedinDevice = LoginOnDevice::where('mobileNumber', $request->mobileNumber)->get();
+        $totalLoggedinDevice = LoginOnDevice::where('mobileNumber',$request->mobileNumber)->get();
 
         return $this->responseWithData(
             [
@@ -150,7 +164,7 @@ class AuthController extends Controller
         if($deleted){
            return $this->responseWithData(
                 [
-                    'user' => $request->user()
+                    $request->user()
                 ],
                 'You logged out successfully.'
             ); 

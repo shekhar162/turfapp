@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('otps', function (Blueprint $table) {
+        Schema::create('product_prices', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('mobileNumber');
-            $table->tinyText('requestedFor');
-            $table->tinyText('deviceId');
-            $table->integer('otp');
-            $table->timestamp('expires_at');
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->integer('price');
+            $table->integer('currency')->default(1);
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('otps');
+        Schema::dropIfExists('turf_prices');
     }
 };

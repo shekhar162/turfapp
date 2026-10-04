@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('otps', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->bigInteger('mobileNumber');
-            $table->tinyText('requestedFor');
-            $table->tinyText('deviceId');
-            $table->integer('otp');
-            $table->timestamp('expires_at');
+            $table->string('closedDays')->nullable();
+            $table->string('closedHrs')->default('12-1,1-2,2-3,3-4,4-5');
+            $table->string('suitableFor')->nullable();
+            $table->longText('otherFacility')->nullable();
+            $table->enum('status', ['1', '2']);
             $table->timestamps();
         });
     }
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('otps');
+        Schema::dropIfExists('turfs');
     }
 };
