@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api\Admin\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -56,19 +56,19 @@ class ProductController extends Controller
     }
 
     public function show(Request $request){
-        $product = Product::find($request->id)->load('price');
+        if(!$product = Product::find($request->id)){
+            return $this->responseWithError("No record found.");
+        }
 
         if ($product->mobileNumber != $request->user()->mobileNumber) {
             return $this->responseWithError("Unauthorized access.");
         }
+            
+        $product->load('price');
+        return $this->responseWithData(
+            $product
+        );
         
-        if($product){
-            return $this->responseWithData(
-                $product
-            );
-        }else{
-            return $this->responseWithError("No record found.");
-        }
     }
 
     // create new product.

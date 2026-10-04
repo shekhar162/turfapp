@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('category_id')->constrained()->onDelete('cascade')->default(1);
             $table->bigInteger('mobileNumber');
             $table->string('closedDays')->nullable();
             $table->string('closedHrs')->default('12-1,1-2,2-3,3-4,4-5');

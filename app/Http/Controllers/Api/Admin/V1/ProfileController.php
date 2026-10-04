@@ -1,20 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api\Admin\V1;
 
 use App\Traits\ApiResponder;
 use Illuminate\Http\Request;
 // use App\Models\LoginOnDevice;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
-class AdminProfileController extends Controller
+class ProfileController extends Controller
 {
     use ApiResponder;
     
     // get admin profile details
     public function profile(Request $request){
-        $user = $request->user();
-        $loginDevices = $request->user()->loginDevices()->select('deviceId','deviceName','deviceModelNo')->get();
+        $user = Auth::user();
+        $loginDevices = $user->loginDevices()->select('deviceId','deviceName','deviceModelNo')->get();
         if($user){
            return $this->responseWithData(
                 [
