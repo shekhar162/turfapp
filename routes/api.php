@@ -18,12 +18,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // These routes will require Sanctum authentication
     Route::post('/v1/logout', [AuthController::class, 'logout']);
 
-    Route::get('/admin/v1/profile', [ProfileController::class, 'profile']);
+    Route::get('/admin/v1/profile/show', [ProfileController::class, 'show']);
+    Route::post('/admin/v1/profile/update', [ProfileController::class, 'update']);
 
     Route::get('/admin/v1/product/list', [ProductController::class, 'index']);
     Route::post('/admin/v1/product/create', [ProductController::class, 'create']);
     Route::post('/admin/v1/product/update', [ProductController::class, 'update']);
-    Route::post('/admin/v1/product/details', [ProductController::class, 'show']);
+    Route::get('/admin/v1/product/show/{id}', [ProductController::class, 'show']);
     Route::post('/admin/v1/product/delete', [ProductController::class, 'delete']);
 
     Route::get('/admin/v1/order/list', [OrderController::class, 'index']);

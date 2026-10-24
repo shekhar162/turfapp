@@ -2,21 +2,24 @@
 
 namespace App\Http\Controllers\Api\Admin\V1;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Traits\ApiResponder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
     use ApiResponder;
+    protected $user = null;
+    protected $product = null;
 
     // list all product
     public function index(Request $request){
-        $user = $request->user();
+        $this->user = $request->user();
         return $this->responseWithData(
-            ["products" => $user->products()->with('price')->get()]
+            ["products" => $this->user->products()->with('price')->get()]
         );
     }
 
@@ -29,44 +32,40 @@ class ProductController extends Controller
 
         // return if validation failed
         if ($validator->fails()) {
-            return $this->responseWithError($validator->errors()->all());
+            return $this->responseWithError($validator->errors()->all(), $request->all());
         }
-        $user = $request->user();
+        $this->user = $request->user();
 
-        $product = new Product();
-        $product->name = $request->name;
-        $product->mobileNumber = $user->mobileNumber;
-        //$product->category_id = $request->categoryId;
-        $product->closedDays = $request->closedDays;
-        $product->closedHrs = $request->closedHrs;
-        $product->suitableFor = $request->suitableFor;
-        $product->otherFacility = $request->otherFacility;
-        $product->status = $request->status;
-        $product->save();
+        $this->product = new Product();
+        $this->product->name = $request->name;
+        $this->product->mobileNumber = $this->user->mobileNumber;
+        //$this->product->category_id = $request->categoryId;
+        $this->product->closedDays = $request->closedDays;
+        $this->product->closedHrs = $request->closedHrs;
+        $this->product->suitableFor = $request->suitableFor;
+        $this->product->otherFacility = $request->otherFacility;
+        $this->product->status = $request->status;
+        $this->product->save();
 
-        $productPrice = $product->price()->create([
+        $this->product->price()->create([
             "price" => $request->price,
             "currency" =>$request->currency
         ]);
         
         return $this->responseWithData(
-            $product,
+            $this->product,
             'New product created successfully!'
         );  
     }
 
     public function show(Request $request){
-        if(!$product = Product::find($request->id)){
+        if(!$this->product = $request->user()->products()->find($request->id)){
             return $this->responseWithError("No record found.");
         }
 
-        if ($product->mobileNumber != $request->user()->mobileNumber) {
-            return $this->responseWithError("Unauthorized access.");
-        }
-            
-        $product->load('price');
+        $this->product->load('price');
         return $this->responseWithData(
-            $product
+            $this->product
         );
         
     }
@@ -80,26 +79,26 @@ class ProductController extends Controller
 
         // return if validation failed
         if ($validator->fails()) {
-            return $this->responseWithError($validator->errors()->all());
+            return $this->responseWithError($validator->errors()->all(), $request->all());
         }
-        $user = $request->user();
+        $this->user = $request->user();
 
-        $product = Product::find($request->id);
-        if(!$product){
-            return $this->responseWithError("No record found.");
+        $this->product = Product::find($request->id);
+        if(!$this->product){
+            return $this->responseWithError("No record found.",$request->all());
         }
         
-        $product->name = $request->name;
-        $product->mobileNumber = $user->mobileNumber;
-        //$product->category_id = $request->categoryId;
-        $product->closedDays = $request->closedDays;
-        $product->closedHrs = $request->closedHrs;
-        $product->suitableFor = $request->suitableFor;
-        $product->otherFacility = $request->otherFacility;
-        $product->status = $request->status;
-        $product->update();
+        $this->product->name = $request->name;
+        $this->product->mobileNumber = $this->user->mobileNumber;
+        //$this->product->category_id = $request->categoryId;
+        $this->product->closedDays = $request->closedDays;
+        $this->product->closedHrs = $request->closedHrs;
+        $this->product->suitableFor = $request->suitableFor;
+        $this->product->otherFacility = $request->otherFacility;
+        $this->product->status = $request->status;
+        $this->product->update();
 
-        $productPrice = $product->price()->update(
+        $this->product->price()->update(
             [
                 "price" => $request->price,
                 "currency" =>$request->currency
@@ -107,23 +106,23 @@ class ProductController extends Controller
         );
         
         return $this->responseWithData(
-            $product->refresh()->load(['price']),
+            $this->product->refresh()->load(['price']),
             'Product updated successfully!'
         );  
     }
 
     public function delete(Request $request){
-        $product = Product::find($request->id);
-        if(!$product){
-            return $this->responseWithError("No record found.");
+        $this->product = Product::find($request->id);
+        if(!$this->product){
+            return $this->responseWithError("No record found.",$request->all());
         }
 
-        $product->price()->delete();
-        $product->delete();
+        $this->product->price()->delete();
+        $this->product->delete();
 
-        $user = $request->user();
+        $this->user = $request->user();
         return $this->responseWithData(
-            $user->products,
+            $this->user->products,
             'Product deleted successfully'
         );
     }
