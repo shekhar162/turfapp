@@ -12,6 +12,11 @@ class Product extends Model
     protected $fillable = [
         'name','mobimobileNumber','closedDays','closedHrs','suitableFor','otherFacility','status'
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'mobileNumber', 'mobileNumber');
+    }
+    
     public function price(){
         return $this->hasOne(ProductPrice::class);
     }
